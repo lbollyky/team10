@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 
 import rclpy
-from std_msgs.msg import String
+from geometry_msgs.msg import Twist
 from rclpy.node import Node
 
 
 class ConstantControl(Node):
     def __init__(self):
         super().__init__("constant_control")
-        self.publisher = self.create_publisher(String, "/ping", 10)
+        self.publisher = self.create_publisher(Twist, "/cmd_vel", 10)
         run_every = 0.2
         self.timer = self.create_timer(run_every, self.ping)
 
     def ping(self):
-        msg = String()
-        msg.data = "sending constant control..."
+        msg = Twist()
+        msg.linear.x = 1.0
+        msg.angular.z = 1.0
         self.publisher.publish(msg)
 
 
