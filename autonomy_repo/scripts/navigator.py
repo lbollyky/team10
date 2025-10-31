@@ -76,6 +76,9 @@ class AStar(object):
             for j in range(-1,2):
                 if i == j == 0:
                     continue  # Skip the current cell itself
+                # TODO: Compute neighbor coordinates
+                # HINT: The neighbor’s coordinates should be offset from x by i * resolution in x and j * resolution in y.
+                #       For example, if resolution = 0.1, the neighbors are at ±0.1 or diagonal ±(0.1,0.1) away.
                 x_neigh = x[0] + i * self.resolution
                 y_neigh = x[1] + j * self.resolution
 
@@ -87,6 +90,12 @@ class AStar(object):
         return neighbors
 
     def find_node_min_toal_cost(self):
+        # TODO: Return the node in the open set with the lowest estimated total cost f(x).
+        # HINT 1: Look through all nodes in self.open_set.
+        # HINT 2: Use self.est_total_cost[...] to get the f(x) value for each node.
+        # HINT 3: You can use Python's min() function with a key=... argument 
+        #         to find the node with the smallest estimated cost.
+        # Example: min(collection, key=lambda node: ...)
         return min(self.open_set, key=lambda node: self.est_total_cost[node])
 
 
@@ -121,6 +130,8 @@ class AStar(object):
             # Explore each neighboring state
             for x_neigh in self.get_neighbors(x_current):
                 if x_neigh not in self.closed_set:
+                    # TODO: Compute tentative cost to reach the neighbor
+                    # HINT: g(x_neigh) = g(x_current) + distance(x_current, x_neigh)
                     cost_to_neighbor = self.cost_to_arrive[x_current] + self.distance(x_current, x_neigh)
 
                     # Add neighbor to open set if it is a new path
@@ -135,6 +146,8 @@ class AStar(object):
                     self.came_from[x_neigh] = x_current
                     self.cost_to_arrive[x_neigh] = cost_to_neighbor
 
+                    # TODO: Record total cost of neighbor nodes
+                    # HINT: f = g + heuristic. Use Euclidean distance to goal as heuristic h(x).
                     self.est_total_cost[x_neigh] = self.cost_to_arrive[x_neigh] + self.distance(x_neigh, self.x_goal)
 
         # If the open set is empty and goal not reached, no path exists
