@@ -41,6 +41,8 @@ class PlottingNode(Node):
         Record data until it's been longer than the set time.
         """
         if len(self.angles) < self.total_msg_cnt:
+            with open("p3_output.txt", "a") as f:
+                f.write(f"{msg.theta}\n")
             self.angles.append(wrap_angle(msg.theta))
         else:
             if not self.plotted:
@@ -62,7 +64,7 @@ class PlottingNode(Node):
         ax.set_xlabel("Time (s)")
         ax.set_ylabel("Theta")
         fig.legend()
-        filename = Path("src/autonomy_repo/plots/p3_output.png")
+        filename = Path("src/team10/autonomy_repo/plots/p3_output.png")
         try:
             fig.savefig(filename)  # save the figure to file
         except OSError as e:
@@ -75,9 +77,15 @@ class PlottingNode(Node):
             print("Close this node with CTRL+C!")
         plt.close(fig)
 
+    def destroy_node(self):
+        self.pub.destroy()
+        self.plot_sub.destroy()
+        super().destroy_node()
+
 
 if __name__ == "__main__":
     rclpy.init()
     node = PlottingNode()
     rclpy.spin(node)
     rclpy.shutdown()
+    node.destroy_node()

@@ -16,9 +16,14 @@ class HeadingController(BaseHeadingController):
         control.omega = self.kp * error
         return control
     
+    def destroy_node(self):
+        self.destroy_publisher()
+        self.destroy_subscription()
+        super().destroy_node()
 
 if __name__ == "__main__":  
     rclpy.init()
     controller = HeadingController()
     rclpy.spin(controller)
     rclpy.shutdown()
+    controller.destroy_node()
