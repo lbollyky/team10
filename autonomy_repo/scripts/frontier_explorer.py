@@ -5,8 +5,6 @@ from nav_msgs.msg import OccupancyGrid
 from asl_tb3_msgs.msg import TurtleBotState
 from std_msgs.msg import Bool
 from asl_tb3_lib.grids import StochOccupancyGrid2D
-from geometry_msgs.msg import PoseStamped
-
 import numpy as np
 import typing as T
 from scipy.signal import convolve2d
@@ -25,7 +23,7 @@ class Frontier_Explorer(Node):
 		self.current_time = 0
 		self.declare_parameter("active", True)
 
-		self.state_sub = self.create_subscription(PoseStamped, "/state", self.state_callback, 10)
+		self.state_sub = self.create_subscription(TurtleBotState, "/state", self.state_callback, 10)
 		self.map_sub = self.create_subscription(OccupancyGrid, "/map", self.map_callback, 10)
 		self.nav_success_sub = self.create_subscription(Bool, "/nav_success", self.nav_success_cb, 10)
 		self.cmd_nav_pub = self.create_publisher(TurtleBotState, "/cmd_nav", 10)
@@ -46,7 +44,7 @@ class Frontier_Explorer(Node):
 		
 		occupied_mask = np.where(self.occupancy.probs >= 0.5, 1, 0)
 		unknown_mask = np.where(self.occupancy.probs == -1, 1, 0)
-		unoccupied_mask = ~unknown_mask & ~occupied_mask
+		unoccupied_mask = np.where((self.occupancy.probs < 0.5) & (self.occupancy.probs >= 0), 1, 0)
 
 		kernel = np.ones((window_size, window_size)) / window_size**2
 		occupied = convolve2d(occupied_mask, kernel, mode='same')
