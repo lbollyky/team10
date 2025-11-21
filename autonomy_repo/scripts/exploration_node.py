@@ -60,7 +60,7 @@ class ExplorationNode(Node):
        if len(frontiers) == 0:
            self.get_logger().info("exploration complete")
            return
-       goal = self.select_frontier(frontiers)
+       goal = self.select_frontiers(frontiers)
        if goal:
            self.send_goal(goal)
 
