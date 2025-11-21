@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 import rclpy
 from geometry_msgs.msg import PoseStamped
 from rclpy.node import Node
@@ -21,10 +20,17 @@ class ExplorationNode(Node):
        self.create_subscription(PoseStamped, "/state", self.state_callback, 10)
        self.create_subscription(OccupancyGrid, "/map", self.map_callback, 10)
        # we can now define the publisher
-       self.goal_pub = self.create_publisher(PoseStamped)
+       self.goal_pub = self.create_publisher(PoseStamped, "/goal_pose", 10)
        self.create_timer(1.0, self.explore)
        self.get_logger().info("Node started.")
 
+   def cluster_frontiers(self, frontiers):
+       return frontiers
+
+   def select_frontiers(self, frontiers):
+       if not frontiers:
+           return None
+       return frontiers[0]
 
    def nav_callback(self, msg):
        self.exploring = False
@@ -79,11 +85,13 @@ class ExplorationNode(Node):
    def send_goal(self, goal):
        msg = PoseStamped()
        msg.header.frame_id = "map"
-       msg.header.stamp = self.get_clocl().now().to_msg()
+       msg.header.stamp = self.get_clock().now().to_msg() #clocl to clock. fixed this. 
        msg.pose.position.x = goal[0]
        msg.pose.position.y = goal[1]
        msg.pose.orientation.w = 1.0
        self.goal_pub.publish(msg)
+
+   
 
 
 def main(args=None):
